@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.ImageView;
 
 public class MarsLandingActivity extends Activity {
 
+	Bitmap mainBM;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,7 +27,7 @@ public class MarsLandingActivity extends Activity {
 		actionBar.setCustomView(R.layout.cust_action_bar);
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		
-		
+		mainBM = BitmapFactory.decodeResource(getResources(), R.drawable.save);
 		
 		// Setting the content view to the main layout.
 		setContentView(R.layout.activity_mars_landing);
