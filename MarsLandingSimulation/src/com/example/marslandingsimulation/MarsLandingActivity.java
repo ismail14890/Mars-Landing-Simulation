@@ -4,12 +4,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 public class MarsLandingActivity extends Activity {
 	private SView newView;
@@ -25,7 +27,17 @@ public class MarsLandingActivity extends Activity {
 		setContentView(R.layout.activity_mars_landing);
 		// Asking window manager to display full screen.
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        Display display = getWindowManager().getDefaultDisplay();
+
+		Point viewSize = new Point();
+		display.getSize(viewSize);
 		
+		// Calculating height and width of the paintView.
+		int width = viewSize.x;
+		int height = viewSize.y;
+		newView = new SView(this.getApplicationContext(), width, height);
+		LinearLayout v = (LinearLayout) findViewById(R.id.linearLayout);
+		v.addView(newView);
 		
 //		final Button btnRestart = (Button)findViewById(R.id.btnRestart);
 //        btnRestart.setOnClickListener(new OnClickListener()
@@ -71,7 +83,9 @@ public class MarsLandingActivity extends Activity {
 	 */
 	@Override
 	public void onBackPressed() {
-		askOnExit();
+//		askOnExit();
+		finish();
+		System.exit(0);
 	}
 	
 	/**

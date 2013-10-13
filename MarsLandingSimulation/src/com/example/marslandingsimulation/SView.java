@@ -6,7 +6,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,39 +19,42 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 
 public class SView extends SurfaceView implements Runnable,
-		SurfaceHolder.Callback, OnTouchListener {
+		SurfaceHolder.Callback, OnTouchListener, SensorEventListener {
 	
 	static final int REFRESH_RATE = 5;
-	static final int GRAVITY = 10;
+	static final int GRAVITY = 4;
+	double t = 0.1;
 	Thread main;
-
 	Paint paint = new Paint();
-
 	Bitmap background;
-
-	int xcor[] = { 0, 200, 190, 218, 260, 275, 298, 309, 327, 336, 368, 382,
-			448, 462, 476, 498, 527, 600, 600, 0, 0 };
-	int ycor[] = { 616, 540, 550, 605, 605, 594, 530, 520, 520, 527, 626, 636,
-			636, 623, 535, 504, 481, 481, 750, 750, 616 };
-
+	int DW, DH; // Display width and height
+	private static final int MOVEMENT = 4;
+	SensorManager mgr = null;
+    float xAxis = 0;
+    float yAxis = 0;
+    
+	int width =0;
+    int height =0;
+    
 	Canvas offscreen;
 	Bitmap buffer;
-
 	boolean downPressed = false;
 	boolean leftPressed = false;
 	boolean rightPressed = false;
 	Boolean gameover = false;
-
 	float x, y;
-	int width = 0;
-
-	double t = 1.5;
-
+	int Changedwidth = 0;
 	Path path;
 
-	public SView(Context context) {
+	public SView(Context context, int width, int height) {
 		super(context);
-		init();
+		mgr  = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        mgr.registerListener(this, mgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
+		this.width = width;
+        this.height = height;
+        setOnTouchListener(this);
+		getHolder().addCallback(this);
+//		init();
 	}
 
 	public SView(Context context, AttributeSet attrs) {
@@ -58,17 +66,17 @@ public class SView extends SurfaceView implements Runnable,
 		super(context, attrs, defStyle);
 		init();
 	}
-
+	
+	int xcor[] = { 0, 200, 200, 400, 400, 800, 800, 0,0 };
+	int ycor[] = { 700, 700, 750, 750, 600,700, 800, 800,700 };
 	public void init() {
 		path = new Path();
 
 		for (int i = 0; i < xcor.length; i++) {
 			path.lineTo(xcor[i], ycor[i]);
 		}
-
-		setOnTouchListener(this);
-
-		getHolder().addCallback(this);
+//		setOnTouchListener(this);
+//		getHolder().addCallback(this);
 	}
 
 	@Override
@@ -76,11 +84,8 @@ public class SView extends SurfaceView implements Runnable,
 		// TODO Auto-generated method stub
 		x = event.getX();
 		y = event.getY();
-
 		t = 0;
-
 		gameover = false;
-
 		return true;
 	}
 
@@ -92,32 +97,51 @@ public class SView extends SurfaceView implements Runnable,
 				SurfaceHolder holder = getHolder();
 				synchronized (holder) {
 					canvas = holder.lockCanvas();
-
 					canvas.drawColor(Color.BLACK);
-
 					paint.setColor(Color.WHITE);
-
-					if (rightPressed == true) {
-						x = x + 20;
-						rightPressed = false;
+					if(xAxis < 0)
+		            {
+		                x = x + MOVEMENT;
+		                y = y - 1;
+		                t = 1;
+		            }
+					else if(xAxis > 0)
+		            {
+		                x = x - MOVEMENT;
+		                y = y - 1;
+		                t = 1;
+		            }
+					else if(yAxis > 6)
+		            {
+						y = y - 4;
+						t = 0.5;
+		            }
+					else
+					{
+						y = (int) y + (int) (t + (0.5 * (GRAVITY * t * t))); // 6 + y
+						t = t + 0.01;
 					}
-					if (leftPressed == true) {
-						x = x - 20;
-						leftPressed = false;
+					
+					// If object hit the side
+					if (x < 0) {
+						x = 0;
 					}
-
+					if (y < 0) {
+						y = 0;
+					}
+					if (x > width) {
+						x = width;
+					}
+					if (y > height) {
+						y = height;
+					}
 					canvas.drawCircle(x, y, 50, paint);
-
 					canvas.drawPath(path, paint);
 				}
-
-				y = (int) y + (int) (t + (0.5 * (GRAVITY * t * t)));
-				t = t + 0.01;
 
 				if (contains(xcor, ycor, x, y + 50)) {
 					paint.setColor(Color.RED);
 					canvas.drawCircle(x, y, 40, paint);
-
 					gameover = true;
 				}
 
@@ -161,12 +185,53 @@ public class SView extends SurfaceView implements Runnable,
 		}
 		return (crossings % 2 != 0); // even or odd
 	}
+	@Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // TODO Auto-generated method stub
+        
+    }
+	
+    @Override
+    public void onSensorChanged(SensorEvent event)
+    {
+        xAxis = event.values[0];
+        yAxis = event.values[1];
+        float zAxis = event.values[2];
+     
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        {                   
+            yAxis = (float) Math.round(yAxis);
+            xAxis = (float) Math.round(xAxis);
+            
+            Log.d("x",Float.toString(xAxis));
+            Log.d("y",Float.toString(yAxis));
+            Log.d("z",Float.toString(zAxis));
+            
+//            if(xAxis < 0)
+//            {
+//                deltaX = deltaX - MOVEMENT;
+//                
+//            }
+//            else if(xAxis > 0)
+//            {
+//                deltaX = deltaX + MOVEMENT;
+//            }
+            
+//            if(yAxis < 0)
+//            {
+//                deltaY = deltaY - MOVEMENT;
+//            }
+//            else if(yAxis >0)
+//            {
+//                deltaY = deltaY + MOVEMENT;
+//            }
+        }
+    }
 	
 	public void reset()
 	{	
 		gameover = false;
-		
-		x = width /2;
+		x = Changedwidth /2;
 		y = 0;
 		t = 0;
 	}
@@ -174,8 +239,8 @@ public class SView extends SurfaceView implements Runnable,
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		width = w;
-		x = width / 2;
+		Changedwidth = w;
+		x = Changedwidth / 2;
 	}
 
 	@Override
