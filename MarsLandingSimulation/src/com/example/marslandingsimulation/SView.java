@@ -3,6 +3,7 @@ package com.example.marslandingsimulation;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -28,7 +29,8 @@ public class SView extends SurfaceView implements Runnable,
 	Thread main;
 	Paint paint = new Paint();
 	Bitmap background;
-	Bitmap ship1, sMain, sLeft, sRight;
+	Bitmap ship1, sMain, sLeft, sRight; 
+	BitmapShader fillBMPshader;
 	int DW, DH; // Display width and height
 	private static final int MOVEMENT = 4;
 	SensorManager mgr = null;
@@ -51,21 +53,16 @@ public class SView extends SurfaceView implements Runnable,
 	public SView(Context context, int width, int height) {
 		super(context);
 		mgr = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		mgr.registerListener(this,
-				mgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-				SensorManager.SENSOR_DELAY_FASTEST);
+		mgr.registerListener(this, mgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
 		this.width = width;
 		this.height = height;
 		init();
 
-		Bitmap temShip = BitmapFactory.decodeResource(getResources(),
-				R.drawable.ship1);
-		Bitmap temSMain = BitmapFactory.decodeResource(getResources(),
-				R.drawable.main);
-		Bitmap temSLeft = BitmapFactory.decodeResource(getResources(),
-				R.drawable.left);
-		Bitmap temSRight = BitmapFactory.decodeResource(getResources(),
-				R.drawable.right);
+		Bitmap temShip = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
+		Bitmap temSMain = BitmapFactory.decodeResource(getResources(), R.drawable.main);
+		Bitmap temSLeft = BitmapFactory.decodeResource(getResources(), R.drawable.left);
+		Bitmap temSRight = BitmapFactory.decodeResource(getResources(), R.drawable.right);
+//		fillBMPshader = new BitmapShader(temSMain, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 		ship1 = Bitmap.createScaledBitmap(temShip, 120, 60, false);
 		sMain = Bitmap.createScaledBitmap(temSMain, 50, 50, false);
 		sLeft = Bitmap.createScaledBitmap(temSLeft, 30, 30, false);
@@ -87,15 +84,15 @@ public class SView extends SurfaceView implements Runnable,
 	// int ycor[] = { 616, 540, 550, 605, 605, 594, 530, 520, 520, 527, 626,
 	// 636,
 	// 636, 623, 535, 504, 481, 481, 750, 750, 616 };
-	int xcor[] = { 0, 200, 200, 400, 400, 800, 800, 0, 0 };
-	int ycor[] = { 700, 700, 750, 750, 600, 700, 800, 800, 700 };
+//int xcor[] = { 0, 200, 200, 400, 400, 800, 800, 0, 0 };
+//int ycor[] = { 700, 700, 750, 750, 600, 700, 800, 800, 700 };
 
 	public void init() {
-		path = new Path();
-
-		for (int i = 0; i < xcor.length; i++) {
-			path.lineTo(xcor[i], ycor[i]);
-		}
+//		path = new Path();
+//
+//		for (int i = 0; i < xcor.length; i++) {
+//			path.lineTo(xcor[i], ycor[i]);
+//		}
 		setOnTouchListener(this);
 		getHolder().addCallback(this);
 	}
@@ -116,6 +113,14 @@ public class SView extends SurfaceView implements Runnable,
 			while (!gameover) {
 				Canvas canvas = null;
 				SurfaceHolder holder = getHolder();
+				// Draw path
+				int xcor[] = { 0, 200, 200, 400, 400, 800, 800, 0, 0 };
+				int ycor[] = { 700, 700, 750, 750, 600, 700, height, height, 700 };
+				path = new Path();
+				for (int i = 0; i < xcor.length; i++) {
+					path.lineTo(xcor[i], ycor[i]);
+				}
+				
 				synchronized (holder) {
 					canvas = holder.lockCanvas();
 					canvas.drawColor(Color.BLACK);
@@ -125,19 +130,17 @@ public class SView extends SurfaceView implements Runnable,
 						y = y - 1;
 						t = 1;
 						canvas.drawBitmap(sLeft, x - 65, y + 28, paint);
-					} else if (yAxis < -1) {
+					} else if (yAxis < -2) {
 						x = x - MOVEMENT;
 						y = y - 1;
 						t = 1;
 						canvas.drawBitmap(sRight, x + 35, y + 28, paint);
-					} else if (xAxis < 8) {
+					} else if (xAxis < 8 && xAxis > 4) {
 						y = y - 4;
 						t = 0.5;
 						canvas.drawBitmap(sMain, x - 25, y + 35, paint);
 					} else {
-						y = (int) y + (int) (t + (0.5 * (GRAVITY * t * t))); // 6
-																				// +
-																				// y
+						y = (int) y + (int) (t + (0.5 * (GRAVITY * t * t)));
 						t = t + 0.01;
 					}
 
@@ -155,8 +158,12 @@ public class SView extends SurfaceView implements Runnable,
 						y = height;
 					}
 					canvas.drawBitmap(ship1, x - 60, y - 30, paint);
-					// canvas.drawCircle(x, y, 50, paint);
-					canvas.drawPath(path, paint);
+					Paint paint1 = new Paint();
+					
+					paint1.setColor(Color.GREEN);  
+					paint1.setStyle(Paint.Style.FILL);
+					
+					canvas.drawPath(path, paint1);
 				}
 
 				if (contains(xcor, ycor, x + 50, y + 60)) {

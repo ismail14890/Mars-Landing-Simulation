@@ -3,19 +3,33 @@
     android:id="@+id/linearLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal">
+    android:orientation="vertical">
+    "
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout"
+        android:layout_height="wrap_content">"
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:background="@drawable/color_black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:max="100"
+            android:progress="100" />
+
+    </RelativeLayout>
 
     <View
         android:id="@+id/newView"
-        android:layout_width="0dip"
-        android:keepScreenOn="true"
-        android:layout_height="fill_parent" />
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:keepScreenOn="true" />
 
 </LinearLayout>
-
-
-
-<!-- <?xml version="1.0" encoding="utf-8"?>
+<!--
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
@@ -27,4 +41,5 @@
         android:id="@+id/newView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
-</FrameLayout> -->
+</FrameLayout>
+-->
