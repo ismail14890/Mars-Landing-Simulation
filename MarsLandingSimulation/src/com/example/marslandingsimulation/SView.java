@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Shader;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -28,8 +29,8 @@ public class SView extends SurfaceView implements Runnable,
 	Thread main;
 	Paint paint = new Paint();
 	Bitmap background;
-	Bitmap ship1, sMain, sLeft, sRight; 
-	BitmapShader fillBMPshader;
+	Bitmap ship1, sMain, sLeft, sRight, sGround, sStars; 
+	BitmapShader fillBMPshaderGround, fillBMPshaderStars;
 	int DW, DH; // Display width and height
 	private static final int MOVEMENT = 4;
 	SensorManager mgr = null;
@@ -58,11 +59,17 @@ public class SView extends SurfaceView implements Runnable,
 		Bitmap temSMain = BitmapFactory.decodeResource(getResources(), R.drawable.main);
 		Bitmap temSLeft = BitmapFactory.decodeResource(getResources(), R.drawable.left);
 		Bitmap temSRight = BitmapFactory.decodeResource(getResources(), R.drawable.right);
-//		fillBMPshader = new BitmapShader(temSMain, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+		Bitmap temSground = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
+		Bitmap temSStars = BitmapFactory.decodeResource(getResources(), R.drawable.stars);
+		
 		ship1 = Bitmap.createScaledBitmap(temShip, 120, 60, false);
 		sMain = Bitmap.createScaledBitmap(temSMain, 50, 50, false);
 		sLeft = Bitmap.createScaledBitmap(temSLeft, 30, 30, false);
 		sRight = Bitmap.createScaledBitmap(temSRight, 30, 30, false);
+		sGround = Bitmap.createScaledBitmap(temSground , 200, 200, false);
+		sStars = Bitmap.createScaledBitmap(temSStars, 200, 200, false);
+		fillBMPshaderGround = new BitmapShader(sGround, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+		fillBMPshaderStars = new BitmapShader(sStars, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 	}
 
 	public SView(Context context, AttributeSet attrs) {
@@ -106,19 +113,25 @@ public class SView extends SurfaceView implements Runnable,
 				}
 				synchronized (holder) {
 					canvas = holder.lockCanvas();
-					canvas.drawColor(Color.BLACK);
+                    Paint paintstars = new Paint();
+					
+                    paintstars.setColor(Color.BLACK);  
+                    paintstars.setStyle(Paint.Style.FILL);
+                    paintstars.setShader(fillBMPshaderStars);
+                    
+					canvas.drawPaint(paintstars);
 					paint.setColor(Color.WHITE);
-					if (yAxis > 2) {
+					if (yAxis > 2 && yAxis < 8) {
 						x = x + MOVEMENT;
 						y = y - 1;
 						t = 1;
 						canvas.drawBitmap(sLeft, x - 65, y + 28, paint);
-					} else if (yAxis < -2) {
+					} else if (yAxis < -2 && yAxis > -8) {
 						x = x - MOVEMENT;
 						y = y - 1;
 						t = 1;
 						canvas.drawBitmap(sRight, x + 35, y + 28, paint);
-					} else if (xAxis < 8 && xAxis > 4) {
+					} else if (xAxis < 8 && xAxis > 2) {
 						y = y - 4;
 						t = 0.5;
 						canvas.drawBitmap(sMain, x - 25, y + 35, paint);
@@ -142,10 +155,9 @@ public class SView extends SurfaceView implements Runnable,
 					}
 					canvas.drawBitmap(ship1, x - 60, y - 30, paint);
 					Paint paint1 = new Paint();
-					
 					paint1.setColor(Color.GREEN);  
 					paint1.setStyle(Paint.Style.FILL);
-					
+					paint1.setShader(fillBMPshaderGround);
 					canvas.drawPath(path, paint1);
 				}
 
