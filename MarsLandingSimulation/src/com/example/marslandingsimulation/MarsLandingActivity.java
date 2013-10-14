@@ -17,9 +17,6 @@ import android.widget.ProgressBar;
 
 public class MarsLandingActivity extends Activity {
 	private SView newView;
-
-	Bitmap mainBM;
-	ProgressBar progressHorizontal = null;
 	boolean fuelUses = false;
 	
 	@Override
@@ -33,20 +30,17 @@ public class MarsLandingActivity extends Activity {
 		// Asking window manager to display full screen.
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         Display display = getWindowManager().getDefaultDisplay();
-        float progressBar = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
+//        float progressBar = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
 
 		Point viewSize = new Point();
 		display.getSize(viewSize);
 		
 		// Calculating height and width of the paintView.
 		int width = viewSize.x;
-		int height = (int) (viewSize.y - progressBar);
+		int height = viewSize.y;
 		newView = new SView(this.getApplicationContext(), width, height);
 		LinearLayout v = (LinearLayout) findViewById(R.id.linearLayout);
 		v.addView(newView);
-		progressHorizontal = (ProgressBar) findViewById(R.id.progressBar1);
-		progressHorizontal.setMax(100);
-		progressHorizontal.setProgress(100);
         
 	}
 
@@ -57,19 +51,27 @@ public class MarsLandingActivity extends Activity {
 		return true;
 	}
 	
-	/**
-	 * Call AskOnEixt () when user pressed back.
-	 */
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		newView.pause();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		newView.resume();
+	}
+	
 	@Override
 	public void onBackPressed() {
 //		askOnExit();
+		newView.pause();
 		finish();
 		System.exit(0);
 	}
-	
-	public void fuel() {
-	}
-	
 	/**
 	 * get selected items from the menu.
 	 */

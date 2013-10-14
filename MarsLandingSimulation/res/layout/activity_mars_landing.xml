@@ -4,26 +4,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-    "
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:id="@+id/relativeLayout"
-        android:layout_height="16dip">
-        
-        <!-- <ImageView
-            android:id="@+id/fuelG"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:padding="2dip"
-            android:src="@drawable/color_cyan" /> -->
-        <ProgressBar
-            android:id="@+id/progressBar1"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:background="@drawable/color_black"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </RelativeLayout>
 
     <View
         android:id="@+id/newView"

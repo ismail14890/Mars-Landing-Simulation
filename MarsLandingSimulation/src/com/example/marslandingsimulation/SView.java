@@ -1,5 +1,7 @@
 package com.example.marslandingsimulation;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,20 +27,25 @@ public class SView extends SurfaceView implements Runnable,
 	
 	static final int REFRESH_RATE = 5;
 	static final int GRAVITY = 4;
+	static final int MOVEMENT = 4;
+	static final int fuelUsage = 1;
+	static final int maxFuel = 800;
+	int fuel = maxFuel;
+	boolean fuelFinished = false;
+	boolean pause = false;
 	double t = 0.1;
 	Thread main;
 	Paint paint = new Paint();
 	Bitmap background;
 	Bitmap ship1, sMain, sLeft, sRight, sGround, sStars; 
 	BitmapShader fillBMPshaderGround, fillBMPshaderStars;
-	int DW, DH; // Display width and height
-	private static final int MOVEMENT = 4;
 	SensorManager mgr = null;
 	float xAxis = 0;
 	float yAxis = 0;
 	int width = 0;
 	int height = 0;
-
+	ArrayList<Integer> xcor = new ArrayList<Integer>();
+	ArrayList<Integer> ycor = new ArrayList<Integer>();
 	Canvas offscreen;
 	Bitmap buffer;
 	Boolean gameover = false;
@@ -66,8 +73,8 @@ public class SView extends SurfaceView implements Runnable,
 		sMain = Bitmap.createScaledBitmap(temSMain, 50, 50, false);
 		sLeft = Bitmap.createScaledBitmap(temSLeft, 30, 30, false);
 		sRight = Bitmap.createScaledBitmap(temSRight, 30, 30, false);
-		sGround = Bitmap.createScaledBitmap(temSground , 200, 200, false);
-		sStars = Bitmap.createScaledBitmap(temSStars, 200, 200, false);
+		sGround = Bitmap.createScaledBitmap(temSground , 300, 300, false);
+		sStars = Bitmap.createScaledBitmap(temSStars, 300, 300, false);
 		fillBMPshaderGround = new BitmapShader(sGround, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 		fillBMPshaderStars = new BitmapShader(sStars, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 	}
@@ -100,41 +107,37 @@ public class SView extends SurfaceView implements Runnable,
 
 	@Override
 	public void run() {
-		while (true) {
-			while (!gameover) {
+		while (!Thread.interrupted()) {
+			while (!pause) {
 				Canvas canvas = null;
 				SurfaceHolder holder = getHolder();
-				// Draw path
-				int xcor[] = { 0, 200, 200, 400, 400, width, width, 0, 0 };
-				int ycor[] = { 700, 700, 750, 750, 600, 700, height, height, 700 };
-				path = new Path();
-				for (int i = 0; i < xcor.length; i++) {
-					path.lineTo(xcor[i], ycor[i]);
-				}
 				synchronized (holder) {
 					canvas = holder.lockCanvas();
                     Paint paintstars = new Paint();
-					
                     paintstars.setColor(Color.BLACK);  
                     paintstars.setStyle(Paint.Style.FILL);
                     paintstars.setShader(fillBMPshaderStars);
-                    
 					canvas.drawPaint(paintstars);
-					paint.setColor(Color.WHITE);
-					if (yAxis > 2 && yAxis < 8) {
+					paint.setColor(Color.CYAN);
+					canvas.drawRect(0, 0, fuel * width / maxFuel, 20, paint);
+					
+					if (yAxis > 2 && yAxis < 8 && !gameover && !fuelFinished) {
 						x = x + MOVEMENT;
 						y = y - 1;
 						t = 1;
 						canvas.drawBitmap(sLeft, x - 65, y + 28, paint);
-					} else if (yAxis < -2 && yAxis > -8) {
+						fuel -= fuelUsage;
+					} else if (yAxis < -2 && yAxis > -8 && !gameover && !fuelFinished) {
 						x = x - MOVEMENT;
 						y = y - 1;
 						t = 1;
 						canvas.drawBitmap(sRight, x + 35, y + 28, paint);
-					} else if (xAxis < 8 && xAxis > 2) {
+						fuel -= fuelUsage;
+					} else if (xAxis < 8 && xAxis > 2 && !gameover && !fuelFinished) {
 						y = y - 4;
 						t = 0.5;
 						canvas.drawBitmap(sMain, x - 25, y + 35, paint);
+						fuel -= (fuelUsage + 1);
 					} else {
 						y = (int) y + (int) (t + (0.5 * (GRAVITY * t * t)));
 						t = t + 0.01;
@@ -160,6 +163,9 @@ public class SView extends SurfaceView implements Runnable,
 					paint1.setShader(fillBMPshaderGround);
 					canvas.drawPath(path, paint1);
 				}
+				if (fuel < 0) {
+					fuelFinished = true;
+				}
 
 				if (contains(xcor, ycor, x + 60, y + 30)) {
 					paint.setColor(Color.RED);
@@ -178,15 +184,15 @@ public class SView extends SurfaceView implements Runnable,
 
 	}
 
-	public boolean contains(int[] xcor, int[] ycor, double x0, double y0) {
+	public boolean contains(ArrayList<Integer> xcor, ArrayList<Integer> ycor, double x0, double y0) {
 		int crossings = 0;
 
-		for (int i = 0; i < xcor.length - 1; i++) {
-			int x1 = xcor[i];
-			int x2 = xcor[i + 1];
+		for (int i = 0; i < xcor.size() - 1; i++) {
+			int x1 = xcor.get(i);
+			int x2 = xcor.get(i + 1);
 
-			int y1 = ycor[i];
-			int y2 = ycor[i + 1];
+			int y1 = ycor.get(i);
+			int y2 = ycor.get(i + 1);
 
 			int dy = y2 - y1;
 			int dx = x2 - x1;
@@ -218,16 +224,6 @@ public class SView extends SurfaceView implements Runnable,
 	public void onSensorChanged(SensorEvent event) {
 		xAxis = event.values[0];
 		yAxis = event.values[1];
-//		float zAxis = event.values[2];
-
-		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			yAxis = (float) Math.round(yAxis);
-			xAxis = (float) Math.round(xAxis);
-
-//			Log.d("x", Float.toString(xAxis));
-//			Log.d("y", Float.toString(yAxis));
-//			Log.d("z", Float.toString(zAxis));
-		}
 	}
 
 	public void reset() {
@@ -240,8 +236,16 @@ public class SView extends SurfaceView implements Runnable,
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		Changedwidth = w;
-		x = Changedwidth / 2;
+		// Draw path
+		xcor.add(0);xcor.add(200);xcor.add(200);xcor.add(400);xcor.add(400);xcor.add(width);xcor.add(width);xcor.add(0);xcor.add(0);
+		ycor.add(700);ycor.add(700);ycor.add(750);ycor.add(750);ycor.add(600);ycor.add(700);ycor.add(height);ycor.add(height);ycor.add(700);
+//		int xor[] = { 0, 200, 200, 400, 400, width, width, 0, 0 };
+//		int yor[] = { 700, 700, 750, 750, 600, 700, height, height, 700 };
+		path = new Path();
+		for (int i = 0; i < xcor.size(); i++) {
+			path.lineTo(xcor.get(i), ycor.get(i));
+		}
+		x = 0;
 	}
 
 	@Override
@@ -255,11 +259,20 @@ public class SView extends SurfaceView implements Runnable,
 		main = new Thread(this);
 		if (main != null)
 			main.start();
+		pause = false;
+	}
+	public void pause()
+	{
+		pause = true;
+		mgr.unregisterListener(this);
+	}
+	public void resume(){
+		mgr.registerListener(this, mgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
-
+		pause = true;
 	}
 }
