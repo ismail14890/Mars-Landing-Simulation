@@ -1,19 +1,13 @@
 package com.example.marslandingsimulation;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 
 public class MarsLandingActivity extends Activity {
 	private SView newView;
@@ -67,10 +61,9 @@ public class MarsLandingActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-//		askOnExit();
-		newView.pause();
 		finish();
 		System.exit(0);
+		newView.pause();
 	}
 	/**
 	 * get selected items from the menu.
@@ -79,28 +72,36 @@ public class MarsLandingActivity extends Activity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()){
 		case R.id.exit:
-			askOnExit();
+			finish();
+			System.exit(0);
+			newView.pause();
 			break;
 		}
 		return true;
 	}
 	
-	/**
-	 * Exit the Finger paint if user select Exit.
-	 */
-	private void askOnExit() {
-		AlertDialog.Builder alertDialog = new AlertDialog.Builder( MarsLandingActivity.this);
-		alertDialog.setPositiveButton("Exit", new OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-				System.exit(0);
-			}
-		});
-		alertDialog.setNegativeButton("Cancel", null);
-		alertDialog.setMessage("Do you want to Quit Mars Landing?");
-		alertDialog.setTitle("Quit Mars Landing");
-		alertDialog.show();
-	}
+//	/**
+//	 * Exit the Finger paint if user select Exit.
+//	 */
+//	private void askOnExit() {		
+//		AlertDialog.Builder alertDialog = new AlertDialog.Builder( MarsLandingActivity.this);
+//		alertDialog.setPositiveButton("Exit", new OnClickListener() {
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				finish();
+//				System.exit(0);
+//				newView.pause();
+//			}
+//		});
+//		alertDialog.setNegativeButton("Cancel",new OnClickListener() {
+//
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				newView.resume();
+//			}
+//		});
+//		alertDialog.setMessage("Do you want to Quit Mars Landing?");
+//		alertDialog.setTitle("Quit Mars Landing");
+//		alertDialog.show();
+//	}
 }
