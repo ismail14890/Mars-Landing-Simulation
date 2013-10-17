@@ -34,11 +34,11 @@ public class SView extends SurfaceView implements Runnable,
 	static final int GRAVITY = 4;
 	static final int MOVEMENT = 4;
 	static final int fuelUsage = 1;
+	double t = 0.1;
 	static final int maxFuel = 800;
 	int fuel = maxFuel;
 	boolean fuelFinished = false;
 	boolean pause = false;
-	double t = 0.1;
 	Thread main;
 	Paint paint = new Paint();
 	Bitmap background;
@@ -68,6 +68,8 @@ public class SView extends SurfaceView implements Runnable,
 		this.height = height;
 		sX = 1920 / (float) width;
 		sY = 1080 / (float) height;
+		x = (float)(100/sX);
+		y = (float)(40/sY);
 		shipW = (int) (120 / sX);
 		shipH = (int) (60 / sY);
 		sMainSize = (int) (50 / sX);
@@ -127,25 +129,24 @@ public class SView extends SurfaceView implements Runnable,
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		// Draw path
-		sX = 1920 / (float) width;
-		sY = 1080 / (float) height;
 		
-		xcor.add(0);	ycor.add(700);
-		xcor.add(200);	ycor.add(700);
-		xcor.add(200);	ycor.add(750);
-		xcor.add(400);	ycor.add(750);
-		xcor.add(400);	ycor.add(600);
-		xcor.add(width);	ycor.add(700);
+		sX = 1920 / (float) w;
+		sY = 1080 / (float) h;
+		
+		xcor.add(0);	ycor.add((int) (700 / sY));
+		xcor.add((int) (200 / sX));	ycor.add((int) (700 / sY));
+		xcor.add((int) (200 / sX));	ycor.add((int) (750 / sY));
+		xcor.add((int) (400 / sX));	ycor.add((int) (750 / sY));
+		xcor.add((int) (400 / sX));	ycor.add((int) (600 / sY));
+		xcor.add(width);	ycor.add((int) (700 / sY));
 		xcor.add(width);	ycor.add(height);
 		xcor.add(0);	ycor.add(height);
-		xcor.add(0);	ycor.add(700);
-		
+		xcor.add(0);	ycor.add((int) (700 / sY));
+		// Draw path
 		path = new Path();
 		for (int i = 0; i < xcor.size(); i++) {
 			path.lineTo(xcor.get(i), ycor.get(i));
 		}
-		x = (float) (w * 0.05);
 	}
 
 	@Override
@@ -156,36 +157,48 @@ public class SView extends SurfaceView implements Runnable,
 				SurfaceHolder holder = getHolder();
 				synchronized (holder) {
 					canvas = holder.lockCanvas();
+					// Stars background
 					Paint paintstars = new Paint();
 					paintstars.setColor(Color.BLACK);
 					paintstars.setStyle(Paint.Style.FILL);
 					paintstars.setShader(fillBMPshaderStars);
 					canvas.drawPaint(paintstars);
+					Paint paint1 = new Paint();
+					paint1.setColor(Color.GREEN);
+					paint1.setStyle(Paint.Style.FILL);
+					paint1.setShader(fillBMPshaderGround);
+					canvas.drawPath(path, paint1);
+					// Fuel
+					Paint paintFuel = new Paint();
+					paintFuel.setColor(Color.GRAY);
+					canvas.drawRect(0, (float)((height)-(5/sY)), (float)((width/2)+(5/sY)), (float)((height)-(35/sY)), paintFuel);
 					paint.setColor(Color.CYAN);
-					canvas.drawRect(0, 0, fuel * width / maxFuel, 20, paint);
+					canvas.drawRect(0, (float)((height)-(10/sY)), fuel * (float)(width/2) / maxFuel, (float) ((height)-(30/sY)), paint);
+					paint.setTextSize((float)(50/sY));
+					canvas.drawText("FUEL:", 0, (float)((height)-(40/sY)), paint);
 					if (!gameover) {
 						if (yAxis > 2 && yAxis < 8 && !fuelFinished) {
-							x = x + MOVEMENT;
+							x = x + (MOVEMENT/sX);
 							y = y - 1;
 							t = 1;
-							canvas.drawBitmap(sLeft, x - 65, y + 28, paint);
+							canvas.drawBitmap(sLeft, x - (65/sX), y + (28/sY), paint);
 							fuel -= fuelUsage;
 							mp.start();
 						} else if (yAxis < -2 && yAxis > -8 && !fuelFinished) {
-							x = x - MOVEMENT;
-							y = y - 1;
+							x = x - (MOVEMENT/sX);
+							y = y - (1/sY);
 							t = 1;
-							canvas.drawBitmap(sRight, x + 35, y + 28, paint);
+							canvas.drawBitmap(sRight, x + (35/sX), y + (28/sY), paint);
 							fuel -= fuelUsage;
 							mp.start(); 
 						} else if (xAxis < 8 && xAxis > 2 && !fuelFinished) {
-							y = y - 4;
+							y = y - (4/sY);
 							t = 0.5;
-							canvas.drawBitmap(sMain, x - 25, y + 35, paint);
+							canvas.drawBitmap(sMain, x - (25/sX), y + (35/sY), paint);
 							fuel -= (fuelUsage + 1);
 							mp.start();
 						} else {
-							y = (int) y + (int) (t + (0.5 * (GRAVITY * t * t)));
+							y = (int) y + (int)(t + (0.5 * ((GRAVITY/sY) * t * t)));
 							t = t + 0.01;
 							mp.pause();
 						}
@@ -195,8 +208,8 @@ public class SView extends SurfaceView implements Runnable,
 					if (x < 0) {
 						x = width;
 					}
-					if (y < 30) {
-						y = 30;
+					if (y < (float)(30/sY)) {
+						y = (float)(30/sY);
 					}
 					if (x > width) {
 						x = 0;
@@ -204,20 +217,16 @@ public class SView extends SurfaceView implements Runnable,
 					if (y > height) {
 						y = height;
 					}
-					canvas.drawBitmap(ship, x - 60, y - 30, paint);
-					Paint paint1 = new Paint();
-					paint1.setColor(Color.GREEN);
-					paint1.setStyle(Paint.Style.FILL);
-					paint1.setShader(fillBMPshaderGround);
-					canvas.drawPath(path, paint1);
+					canvas.drawBitmap(ship, x - (60/sX), y - (30/sY), paint);
+					
 				}
 				if (fuel < 0) {
 					fuelFinished = true;
 				}
 
-				if (contains(xcor, ycor, x + 60, y + 30)) {
+				if (contains(xcor, ycor, x + (60/sX), y + (30/sY))) {
 					paint.setColor(Color.RED);
-					canvas.drawCircle(x, y + 30, 20, paint);
+					canvas.drawCircle(x, y + (30/sX), (20/sY), paint);
 					gameover = true;
 				}
 
