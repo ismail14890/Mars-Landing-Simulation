@@ -21,14 +21,16 @@ public final class R {
         public static final int activity_vertical_margin=0x7f050001;
     }
     public static final class drawable {
-        public static final int ground=0x7f020000;
-        public static final int ic_launcher=0x7f020001;
-        public static final int left=0x7f020002;
-        public static final int main=0x7f020003;
-        public static final int right=0x7f020004;
-        public static final int ship=0x7f020005;
-        public static final int ship1=0x7f020006;
-        public static final int stars=0x7f020007;
+        public static final int explosion=0x7f020000;
+        public static final int ground=0x7f020001;
+        public static final int ic_launcher=0x7f020002;
+        public static final int left=0x7f020003;
+        public static final int main=0x7f020004;
+        public static final int right=0x7f020005;
+        public static final int ship=0x7f020006;
+        public static final int ship1=0x7f020007;
+        public static final int shipcrash=0x7f020008;
+        public static final int stars=0x7f020009;
     }
     public static final class id {
         public static final int exit=0x7f090002;
@@ -42,7 +44,8 @@ public final class R {
         public static final int mars_landing=0x7f080000;
     }
     public static final class raw {
-        public static final int rocket=0x7f040000;
+        public static final int explosion=0x7f040000;
+        public static final int rocket=0x7f040001;
     }
     public static final class string {
         public static final int app_name=0x7f060000;

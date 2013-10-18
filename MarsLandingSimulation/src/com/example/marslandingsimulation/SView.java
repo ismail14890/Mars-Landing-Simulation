@@ -1,5 +1,6 @@
 package com.example.marslandingsimulation;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Movie;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
@@ -29,6 +31,8 @@ public class SView extends SurfaceView implements Runnable,
 	
 	SoundPool soundPool;
 	MediaPlayer mp;
+	MediaPlayer mp2;
+	Movie explodeGif;
 	
 	static final int REFRESH_RATE = 5;
 	static final int GRAVITY = 4;
@@ -41,12 +45,12 @@ public class SView extends SurfaceView implements Runnable,
 	boolean pause = false;
 	Thread main;
 	Paint paint = new Paint();
-	Bitmap background;
-	Bitmap ship, sMain, sLeft,sRight, sGround, sStars; 
+	Bitmap ship,shipCrash, sMain, sLeft,sRight, sGround, sStars; 
 	int shipW, shipH, sMainSize, sLeftSize, sGroundSize, sStarsSize, sMainSizeH, sLeftSizeH, sGroundSizeH, sStarsSizeH;
 	BitmapShader fillBMPshaderGround, fillBMPshaderStars;
 	float x, y;
 	float sX, sY;
+	float mMovieStart = 0;
 	SensorManager newSensor = null;
 	float xAxis = 0;
 	float yAxis = 0;
@@ -81,12 +85,14 @@ public class SView extends SurfaceView implements Runnable,
         sStarsSize = (int) (300 / sX);
         sStarsSizeH = (int) (300 / sY);
         Bitmap temShip = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
+        Bitmap temShipcrash = BitmapFactory.decodeResource(getResources(), R.drawable.shipcrash);
 		Bitmap temSMain = BitmapFactory.decodeResource(getResources(), R.drawable.main);
 		Bitmap temSLeft = BitmapFactory.decodeResource(getResources(), R.drawable.left);
 		Bitmap temSRight = BitmapFactory.decodeResource(getResources(), R.drawable.right);
 		Bitmap temSground = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
 		Bitmap temSStars = BitmapFactory.decodeResource(getResources(), R.drawable.stars);
 		ship = Bitmap.createScaledBitmap(temShip, shipW, shipH, true);
+		shipCrash = Bitmap.createScaledBitmap(temShipcrash, shipW, shipH, true);
 		sMain = Bitmap.createScaledBitmap(temSMain, sMainSize, sMainSizeH, true);
 		sLeft = Bitmap.createScaledBitmap(temSLeft, sLeftSize, sLeftSizeH, true);
 		sRight = Bitmap.createScaledBitmap(temSRight, sLeftSize, sLeftSizeH, true);
@@ -98,6 +104,10 @@ public class SView extends SurfaceView implements Runnable,
 		init();
 		mp = MediaPlayer.create(getContext(), R.raw.rocket);
 		mp.setLooping(true);
+		mp2 = MediaPlayer.create(getContext(), R.raw.explosion);
+		mp2.setLooping(true);
+		InputStream is = this.getContext().getResources().openRawResource(R.drawable.explosion);
+		explodeGif = Movie.decodeStream(is);
 	}
 
 	public SView(Context context, AttributeSet attrs) {
@@ -174,7 +184,7 @@ public class SView extends SurfaceView implements Runnable,
 					canvas.drawRect(0, (float)((height)-(5/sY)), (float)((width/2)+(5/sY)), (float)((height)-(35/sY)), paintFuel);
 					paint.setColor(Color.CYAN);
 					canvas.drawRect(0, (float)((height)-(10/sY)), fuel * (float)(width/2) / maxFuel, (float) ((height)-(30/sY)), paint);
-					paint.setTextSize((float)(50/sY));
+					paint.setTextSize((float)(45/sY));
 					canvas.drawText("FUEL:", 0, (float)((height)-(40/sY)), paint);
 					if (!gameover) {
 						if (yAxis > 2 && yAxis < 8 && !fuelFinished) {
@@ -217,18 +227,37 @@ public class SView extends SurfaceView implements Runnable,
 					if (y > height) {
 						y = height;
 					}
-					canvas.drawBitmap(ship, x - (60/sX), y - (30/sY), paint);
-					
 				}
 				if (fuel < 0) {
 					fuelFinished = true;
 				}
 
 				if (contains(xcor, ycor, x + (60/sX), y + (30/sY))) {
-					paint.setColor(Color.RED);
-					canvas.drawCircle(x, y + (30/sX), (20/sY), paint);
+					long now = android.os.SystemClock.uptimeMillis();
+					if (mMovieStart == 0) { // first time
+						mMovieStart = now;
+					}
+					int dur = explodeGif.duration();
+					if (dur == 0)
+						dur = 1000;
+					
+					int relTime = (int) ((now - mMovieStart) % dur);
+					explodeGif.setTime(relTime);
+					
+					Bitmap movieBitmap = Bitmap.createBitmap((int) (80 / sX),
+							(int) (40 / sY), Bitmap.Config.ARGB_8888);
+					canvas.drawBitmap(shipCrash, x - (60/sX), y - (30/sY), paint);
+					Canvas movieCanvas = new Canvas(movieBitmap);
+//					movieCanvas.scale(width*sX, height*sY);
+					explodeGif.draw(movieCanvas, 0, 0, paint);
+					canvas.drawBitmap(movieBitmap,x - (60/sX),y - (30/sY),paint);
 					gameover = true;
 				}
+				else
+				{
+					canvas.drawBitmap(ship, x - (60/sX), y - (30/sY), paint);
+				}
+				
 
 				try {
 					Thread.sleep(REFRESH_RATE);
