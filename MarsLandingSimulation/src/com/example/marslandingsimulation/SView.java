@@ -57,6 +57,8 @@ public class SView extends SurfaceView implements Runnable,
 	float yAxis = 0;
 	int width = 0;
 	int height = 0;
+	ArrayList<Integer> xcorland = new ArrayList<Integer>();
+	ArrayList<Integer> ycorland = new ArrayList<Integer>();
 	ArrayList<Integer> xcor = new ArrayList<Integer>();
 	ArrayList<Integer> ycor = new ArrayList<Integer>();
 	Canvas offscreen;
@@ -144,6 +146,12 @@ public class SView extends SurfaceView implements Runnable,
 		
 		sX = 1920 / (float) w;
 		sY = 1080 / (float) h;
+		
+		xcorland.add((int) (200 / sX));	ycorland.add((int) (725 / sY));
+		xcorland.add((int) (200 / sX));	ycorland.add((int) (750 / sY));
+		xcorland.add((int) (400 / sX));	ycorland.add((int) (750 / sY));
+		xcorland.add((int) (400 / sX));	ycorland.add((int) (725 / sY));
+		xcorland.add((int) (200 / sX));	ycorland.add((int) (725 / sY));
 		
 		xcor.add(0);	ycor.add((int) (700 / sY));
 		xcor.add((int) (200 / sX));	ycor.add((int) (700 / sY));
@@ -233,8 +241,12 @@ public class SView extends SurfaceView implements Runnable,
 				if (fuel < 0) {
 					fuelFinished = true;
 				}
+				
+				if (contains(xcorland, ycorland, x + (60/sX), y + (30/sY))) {
+					gameover = true;
+				}
 
-				if (contains(xcor, ycor, x + (60/sX), y + (30/sY))) {
+				if (contains(xcor, ycor, x - (55/sX), y + (25/sY)) || contains(xcor, ycor, x + (55/sX), y + (25/sY))) {
 					long current = android.os.SystemClock.uptimeMillis();
 					if (animStart == 0) 
 					{
@@ -317,10 +329,13 @@ public class SView extends SurfaceView implements Runnable,
 	}
 
 	public void reset() {
+		t = 0.1;
+		fuel = maxFuel;
+		pause = false;
+		animStart = 0;
 		gameover = false;
-		x = Changedwidth / 2;
-		y = 0;
-		t = 0;
+		x = (float)(100/sX);
+		y = (float)(40/sY);
 	}
 
 	@Override

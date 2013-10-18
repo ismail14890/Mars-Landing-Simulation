@@ -36,6 +36,7 @@ public final class R {
         public static final int exit=0x7f090002;
         public static final int linearLayout=0x7f090000;
         public static final int newView=0x7f090001;
+        public static final int reset=0x7f090003;
     }
     public static final class layout {
         public static final int activity_mars_landing=0x7f030000;
@@ -50,7 +51,8 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f060000;
         public static final int exit=0x7f060001;
-        public static final int hello_world=0x7f060002;
+        public static final int hello_world=0x7f060003;
+        public static final int reset=0x7f060002;
     }
     public static final class style {
         /** 

@@ -76,32 +76,10 @@ public class MarsLandingActivity extends Activity {
 			System.exit(0);
 			newView.pause();
 			break;
+		case R.id.reset:
+			newView.reset();
+			break;
 		}
 		return true;
 	}
-	
-//	/**
-//	 * Exit the Finger paint if user select Exit.
-//	 */
-//	private void askOnExit() {		
-//		AlertDialog.Builder alertDialog = new AlertDialog.Builder( MarsLandingActivity.this);
-//		alertDialog.setPositiveButton("Exit", new OnClickListener() {
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				finish();
-//				System.exit(0);
-//				newView.pause();
-//			}
-//		});
-//		alertDialog.setNegativeButton("Cancel",new OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				newView.resume();
-//			}
-//		});
-//		alertDialog.setMessage("Do you want to Quit Mars Landing?");
-//		alertDialog.setTitle("Quit Mars Landing");
-//		alertDialog.show();
-//	}
 }

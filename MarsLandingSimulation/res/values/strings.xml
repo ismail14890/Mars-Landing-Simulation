@@ -3,6 +3,7 @@
 
     <string name="app_name">Mars Landing Simulation</string>
     <string name="exit">Exit</string>
+    <string name="reset">Replay</string>
     <string name="hello_world">Hello world!</string>
 
 </resources>
