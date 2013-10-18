@@ -131,7 +131,7 @@ public class SView extends SurfaceView implements Runnable,
 		// TODO Auto-generated method stub
 		x = event.getX();
 		y = event.getY();
-		t = 0;
+		t = 1;
 		gameover = false;
 		return true;
 	}
@@ -184,8 +184,8 @@ public class SView extends SurfaceView implements Runnable,
 					canvas.drawRect(0, (float)((height)-(5/sY)), (float)((width/2)+(5/sY)), (float)((height)-(35/sY)), paintFuel);
 					paint.setColor(Color.CYAN);
 					canvas.drawRect(0, (float)((height)-(10/sY)), fuel * (float)(width/2) / maxFuel, (float) ((height)-(30/sY)), paint);
-					paint.setTextSize((float)(45/sY));
-					canvas.drawText("FUEL:", 0, (float)((height)-(40/sY)), paint);
+					paint.setTextSize((float)(40/sY));
+					canvas.drawText("Fuel:", 0, (float)((height)-(40/sY)), paint);
 					if (!gameover) {
 						if (yAxis > 2 && yAxis < 8 && !fuelFinished) {
 							x = x + (MOVEMENT/sX);
@@ -244,11 +244,10 @@ public class SView extends SurfaceView implements Runnable,
 					int relTime = (int) ((now - mMovieStart) % dur);
 					explodeGif.setTime(relTime);
 					
-					Bitmap movieBitmap = Bitmap.createBitmap((int) (80 / sX),
-							(int) (40 / sY), Bitmap.Config.ARGB_8888);
+					Bitmap movieBitmap = Bitmap.createBitmap((int) (80 / sX), (int) (80 / sY), Bitmap.Config.ARGB_8888);
 					canvas.drawBitmap(shipCrash, x - (60/sX), y - (30/sY), paint);
 					Canvas movieCanvas = new Canvas(movieBitmap);
-//					movieCanvas.scale(width*sX, height*sY);
+					movieCanvas.scale(width/1920f, height/1080f);
 					explodeGif.draw(movieCanvas, 0, 0, paint);
 					canvas.drawBitmap(movieBitmap,x - (60/sX),y - (30/sY),paint);
 					gameover = true;
