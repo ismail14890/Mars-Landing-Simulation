@@ -17,6 +17,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.AttributeSet;
@@ -29,10 +30,10 @@ import android.view.View.OnTouchListener;
 public class SView extends SurfaceView implements Runnable,
 		SurfaceHolder.Callback, OnTouchListener, SensorEventListener {
 	
-	SoundPool soundPool;
+	SoundPool sP;
 	MediaPlayer mp;
-	MediaPlayer mp2;
 	Movie explodeGif;
+	int explosionID;
 	
 	static final int REFRESH_RATE = 5;
 	static final int GRAVITY = 4;
@@ -50,7 +51,7 @@ public class SView extends SurfaceView implements Runnable,
 	BitmapShader fillBMPshaderGround, fillBMPshaderStars;
 	float x, y;
 	float sX, sY;
-	float mMovieStart = 0;
+	float animStart = 0;
 	SensorManager newSensor = null;
 	float xAxis = 0;
 	float yAxis = 0;
@@ -104,8 +105,8 @@ public class SView extends SurfaceView implements Runnable,
 		init();
 		mp = MediaPlayer.create(getContext(), R.raw.rocket);
 		mp.setLooping(true);
-		mp2 = MediaPlayer.create(getContext(), R.raw.explosion);
-		mp2.setLooping(true);
+		sP = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+		explosionID = sP.load(getContext(), R.raw.explosion, 1);
 		InputStream is = this.getContext().getResources().openRawResource(R.drawable.explosion);
 		explodeGif = Movie.decodeStream(is);
 	}
@@ -132,6 +133,7 @@ public class SView extends SurfaceView implements Runnable,
 		x = event.getX();
 		y = event.getY();
 		t = 1;
+		animStart = 0;
 		gameover = false;
 		return true;
 	}
@@ -233,23 +235,26 @@ public class SView extends SurfaceView implements Runnable,
 				}
 
 				if (contains(xcor, ycor, x + (60/sX), y + (30/sY))) {
-					long now = android.os.SystemClock.uptimeMillis();
-					if (mMovieStart == 0) { // first time
-						mMovieStart = now;
+					long current = android.os.SystemClock.uptimeMillis();
+					if (animStart == 0) 
+					{
+						sP.play(explosionID, 1, 1, 1, 0, 1f);
+						animStart = 1;
 					}
-					int dur = explodeGif.duration();
-					if (dur == 0)
-						dur = 1000;
 					
-					int relTime = (int) ((now - mMovieStart) % dur);
-					explodeGif.setTime(relTime);
+					int gifDuration = explodeGif.duration();
+					if (gifDuration == 0)
+						gifDuration = 1000;
 					
-					Bitmap movieBitmap = Bitmap.createBitmap((int) (80 / sX), (int) (80 / sY), Bitmap.Config.ARGB_8888);
+					int time = (int) ((current - animStart) % gifDuration);
+					explodeGif.setTime(time);
+					
+					Bitmap animBitmap = Bitmap.createBitmap((int) (80 / sX), (int) (80 / sY), Bitmap.Config.ARGB_8888);
 					canvas.drawBitmap(shipCrash, x - (60/sX), y - (30/sY), paint);
-					Canvas movieCanvas = new Canvas(movieBitmap);
-					movieCanvas.scale(width/1920f, height/1080f);
-					explodeGif.draw(movieCanvas, 0, 0, paint);
-					canvas.drawBitmap(movieBitmap,x - (60/sX),y - (30/sY),paint);
+					Canvas animCanvas = new Canvas(animBitmap);
+					animCanvas.scale(width/1920f, height/1080f);
+					explodeGif.draw(animCanvas, 0, 0, paint);
+					canvas.drawBitmap(animBitmap,x - (60/sX),y - (60/sY),paint);
 					gameover = true;
 				}
 				else
