@@ -33,7 +33,7 @@ public class SView extends SurfaceView implements Runnable,
 	SoundPool sP;
 	MediaPlayer mp;
 	Movie explodeGif;
-	int explosionID;
+	int explosion1;
 	
 	static final int REFRESH_RATE = 5;
 	static final int GRAVITY = 4;
@@ -44,10 +44,13 @@ public class SView extends SurfaceView implements Runnable,
 	int fuel = maxFuel;
 	boolean fuelFinished = false;
 	boolean pause = false;
+	Boolean gameover = false;
+	boolean atMenu = false;
 	Thread main;
 	Paint paint = new Paint();
-	Bitmap ship,shipCrash, sMain, sLeft,sRight, sGround, sStars; 
-	int shipW, shipH, sMainSize, sLeftSize, sGroundSize, sStarsSize, sMainSizeH, sLeftSizeH, sGroundSizeH, sStarsSizeH;
+	Bitmap ship,shipCrash, sMain, sLeft,sRight, sGround, sStars, sMessage, sMessage2, sMenu; 
+	int shipW, shipH, sMainSize, sLeftSize, sGroundSize, sStarsSize, sMainSizeH, sLeftSizeH, 
+	sGroundSizeH, sStarsSizeH, sMessageSize, sMessageSizeH;
 	BitmapShader fillBMPshaderGround, fillBMPshaderStars;
 	float x, y;
 	float sX, sY;
@@ -63,7 +66,7 @@ public class SView extends SurfaceView implements Runnable,
 	ArrayList<Integer> ycor = new ArrayList<Integer>();
 	Canvas offscreen;
 	Bitmap buffer;
-	Boolean gameover = false;
+	
 	int Changedwidth = 0;
 	Path path;
 
@@ -87,6 +90,8 @@ public class SView extends SurfaceView implements Runnable,
         sGroundSizeH = (int) (300 / sY);
         sStarsSize = (int) (300 / sX);
         sStarsSizeH = (int) (300 / sY);
+        sMessageSize = (int) (1920 / sX);
+        sMessageSizeH = (int) (1080 / sY);
         Bitmap temShip = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
         Bitmap temShipcrash = BitmapFactory.decodeResource(getResources(), R.drawable.shipcrash);
 		Bitmap temSMain = BitmapFactory.decodeResource(getResources(), R.drawable.main);
@@ -94,6 +99,9 @@ public class SView extends SurfaceView implements Runnable,
 		Bitmap temSRight = BitmapFactory.decodeResource(getResources(), R.drawable.right);
 		Bitmap temSground = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
 		Bitmap temSStars = BitmapFactory.decodeResource(getResources(), R.drawable.stars);
+		Bitmap temGameover = BitmapFactory.decodeResource(getResources(), R.drawable.gameover);
+		Bitmap temCongrat = BitmapFactory.decodeResource(getResources(), R.drawable.congrat);
+		Bitmap temMenu = BitmapFactory.decodeResource(getResources(), R.drawable.menubg);
 		ship = Bitmap.createScaledBitmap(temShip, shipW, shipH, true);
 		shipCrash = Bitmap.createScaledBitmap(temShipcrash, shipW, shipH, true);
 		sMain = Bitmap.createScaledBitmap(temSMain, sMainSize, sMainSizeH, true);
@@ -101,14 +109,18 @@ public class SView extends SurfaceView implements Runnable,
 		sRight = Bitmap.createScaledBitmap(temSRight, sLeftSize, sLeftSizeH, true);
 		sGround = Bitmap.createScaledBitmap(temSground , sGroundSize, sGroundSizeH, true);
 		sStars = Bitmap.createScaledBitmap(temSStars, sStarsSize, sStarsSizeH, true);
+		sMessage = Bitmap.createScaledBitmap(temGameover, sMessageSize, sMessageSizeH, true);
+		sMessage2 = Bitmap.createScaledBitmap(temCongrat, sMessageSize, sMessageSizeH, true);
+		sMenu = Bitmap.createScaledBitmap(temMenu, width, height, true);
 		fillBMPshaderGround = new BitmapShader(sGround, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 		fillBMPshaderStars = new BitmapShader(sStars, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 		
 		init();
+		atMenu = true;
 		mp = MediaPlayer.create(getContext(), R.raw.rocket);
 		mp.setLooping(true);
 		sP = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-		explosionID = sP.load(getContext(), R.raw.explosion, 1);
+		explosion1 = sP.load(getContext(), R.raw.explosion, 1);
 		InputStream is = this.getContext().getResources().openRawResource(R.drawable.explosion);
 		explodeGif = Movie.decodeStream(is);
 	}
@@ -132,11 +144,9 @@ public class SView extends SurfaceView implements Runnable,
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
-		x = event.getX();
-		y = event.getY();
-		t = 1;
-		animStart = 0;
-		gameover = false;
+		if(gameover){
+			reset();
+		}
 		return true;
 	}
 	
@@ -158,6 +168,11 @@ public class SView extends SurfaceView implements Runnable,
 		xcor.add((int) (200 / sX));	ycor.add((int) (750 / sY));
 		xcor.add((int) (400 / sX));	ycor.add((int) (750 / sY));
 		xcor.add((int) (400 / sX));	ycor.add((int) (600 / sY));
+		
+		xcor.add((int) (450 / sX));	ycor.add((int) (400 / sY));
+		xcor.add((int) (460 / sX));	ycor.add((int) (400 / sY));
+		xcor.add((int) (490 / sX));	ycor.add((int) (600 / sY));
+		
 		xcor.add(width);	ycor.add((int) (700 / sY));
 		xcor.add(width);	ycor.add(height);
 		xcor.add(0);	ycor.add(height);
@@ -200,20 +215,20 @@ public class SView extends SurfaceView implements Runnable,
 						if (yAxis > 2 && yAxis < 8 && !fuelFinished) {
 							x = x + (MOVEMENT/sX);
 							y = y - 1;
-							t = 1;
+							t = 1.1;
 							canvas.drawBitmap(sLeft, x - (65/sX), y + (28/sY), paint);
 							fuel -= fuelUsage;
 							mp.start();
 						} else if (yAxis < -2 && yAxis > -8 && !fuelFinished) {
 							x = x - (MOVEMENT/sX);
 							y = y - (1/sY);
-							t = 1;
+							t = 1.1;
 							canvas.drawBitmap(sRight, x + (35/sX), y + (28/sY), paint);
 							fuel -= fuelUsage;
 							mp.start(); 
 						} else if (xAxis < 8 && xAxis > 2 && !fuelFinished) {
 							y = y - (4/sY);
-							t = 0.5;
+							t = 0.8;
 							canvas.drawBitmap(sMain, x - (25/sX), y + (35/sY), paint);
 							fuel -= (fuelUsage + 1);
 							mp.start();
@@ -244,13 +259,15 @@ public class SView extends SurfaceView implements Runnable,
 				
 				if (contains(xcorland, ycorland, x + (60/sX), y + (30/sY))) {
 					gameover = true;
+					mp.pause();
+					canvas.drawBitmap(sMessage2,  (float)((width/2)-(960/sX)), (float)((height/2)-(540/sX)), paint);
 				}
 
 				if (contains(xcor, ycor, x - (55/sX), y + (25/sY)) || contains(xcor, ycor, x + (55/sX), y + (25/sY))) {
 					long current = android.os.SystemClock.uptimeMillis();
 					if (animStart == 0) 
 					{
-						sP.play(explosionID, 1, 1, 1, 0, 1f);
+						sP.play(explosion1, 1, 1, 1, 0, 1f);
 						animStart = 1;
 					}
 					
@@ -267,13 +284,21 @@ public class SView extends SurfaceView implements Runnable,
 					animCanvas.scale(width/1920f, height/1080f);
 					explodeGif.draw(animCanvas, 0, 0, paint);
 					canvas.drawBitmap(animBitmap,x - (60/sX),y - (60/sY),paint);
+					canvas.drawBitmap(animBitmap,x + (5/sX),y - (50/sY),paint);
 					gameover = true;
+					mp.pause();
+					canvas.drawBitmap(sMessage,  (float)((width/2)-(960/sX)), (float)((height/2)-(540/sX)), paint);
 				}
 				else
 				{
 					canvas.drawBitmap(ship, x - (60/sX), y - (30/sY), paint);
 				}
-				
+				if(atMenu)
+				{
+					mp.pause();
+					gameover = true;
+					canvas.drawBitmap(sMenu, 0, 0, paint);
+				}
 
 				try {
 					Thread.sleep(REFRESH_RATE);
@@ -331,9 +356,11 @@ public class SView extends SurfaceView implements Runnable,
 	public void reset() {
 		t = 0.1;
 		fuel = maxFuel;
+		fuelFinished = false;
 		pause = false;
 		animStart = 0;
 		gameover = false;
+		atMenu = false;
 		x = (float)(100/sX);
 		y = (float)(40/sY);
 	}
