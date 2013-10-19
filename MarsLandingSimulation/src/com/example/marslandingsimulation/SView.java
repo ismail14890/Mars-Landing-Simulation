@@ -48,7 +48,7 @@ public class SView extends SurfaceView implements Runnable,
 	boolean atMenu = false;
 	Thread main;
 	Paint paint = new Paint();
-	Bitmap ship,shipCrash, sMain, sLeft,sRight, sGround, sStars, sMessage, sMessage2, sMenu; 
+	Bitmap ship,shipCrash, sMain, sLeft,sRight, sGround, sStars, sMessage, sMessage2, sMenu, landing; 
 	int shipW, shipH, sMainSize, sLeftSize, sGroundSize, sStarsSize, sMainSizeH, sLeftSizeH, 
 	sGroundSizeH, sStarsSizeH, sMessageSize, sMessageSizeH;
 	BitmapShader fillBMPshaderGround, fillBMPshaderStars;
@@ -102,6 +102,7 @@ public class SView extends SurfaceView implements Runnable,
 		Bitmap temGameover = BitmapFactory.decodeResource(getResources(), R.drawable.gameover);
 		Bitmap temCongrat = BitmapFactory.decodeResource(getResources(), R.drawable.congrat);
 		Bitmap temMenu = BitmapFactory.decodeResource(getResources(), R.drawable.menubg);
+		Bitmap temlanding = BitmapFactory.decodeResource(getResources(), R.drawable.landing);
 		ship = Bitmap.createScaledBitmap(temShip, shipW, shipH, true);
 		shipCrash = Bitmap.createScaledBitmap(temShipcrash, shipW, shipH, true);
 		sMain = Bitmap.createScaledBitmap(temSMain, sMainSize, sMainSizeH, true);
@@ -112,6 +113,7 @@ public class SView extends SurfaceView implements Runnable,
 		sMessage = Bitmap.createScaledBitmap(temGameover, sMessageSize, sMessageSizeH, true);
 		sMessage2 = Bitmap.createScaledBitmap(temCongrat, sMessageSize, sMessageSizeH, true);
 		sMenu = Bitmap.createScaledBitmap(temMenu, width, height, true);
+		landing = Bitmap.createScaledBitmap(temlanding, (int) (200 / sX), (int) (25 / sY), true);
 		fillBMPshaderGround = new BitmapShader(sGround, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 		fillBMPshaderStars = new BitmapShader(sStars, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 		
@@ -157,26 +159,32 @@ public class SView extends SurfaceView implements Runnable,
 		sX = 1920 / (float) w;
 		sY = 1080 / (float) h;
 		
-		xcorland.add((int) (200 / sX));	ycorland.add((int) (725 / sY));
-		xcorland.add((int) (200 / sX));	ycorland.add((int) (750 / sY));
-		xcorland.add((int) (400 / sX));	ycorland.add((int) (750 / sY));
-		xcorland.add((int) (400 / sX));	ycorland.add((int) (725 / sY));
-		xcorland.add((int) (200 / sX));	ycorland.add((int) (725 / sY));
+		xcorland.add((int) (1140 / sX));	ycorland.add((int) (1005 / sY));
+		xcorland.add((int) (1140 / sX));	ycorland.add((int) (1030 / sY));
+		xcorland.add((int) (1340 / sX));	ycorland.add((int) (1030 / sY));
+		xcorland.add((int) (1340 / sX));	ycorland.add((int) (1005 / sY));
+		xcorland.add((int) (1140 / sX));	ycorland.add((int) (1005 / sY));
 		
-		xcor.add(0);	ycor.add((int) (700 / sY));
-		xcor.add((int) (200 / sX));	ycor.add((int) (700 / sY));
-		xcor.add((int) (200 / sX));	ycor.add((int) (750 / sY));
-		xcor.add((int) (400 / sX));	ycor.add((int) (750 / sY));
-		xcor.add((int) (400 / sX));	ycor.add((int) (600 / sY));
-		
-		xcor.add((int) (450 / sX));	ycor.add((int) (400 / sY));
-		xcor.add((int) (460 / sX));	ycor.add((int) (400 / sY));
-		xcor.add((int) (490 / sX));	ycor.add((int) (600 / sY));
-		
-		xcor.add(width);	ycor.add((int) (700 / sY));
-		xcor.add(width);	ycor.add(height);
-		xcor.add(0);	ycor.add(height);
-		xcor.add(0);	ycor.add((int) (700 / sY));
+		xcor.add(0);	ycor.add((int) (980 / sY));
+		xcor.add((int) (80 / sX));	ycor.add((int) (880 / sY));
+		xcor.add((int) (190 / sX));	ycor.add((int) (600 / sY));
+		xcor.add((int) (300 / sX));	ycor.add((int) (700 / sY));
+		xcor.add((int) (570 / sX));	ycor.add((int) (780 / sY));
+		xcor.add((int) (710 / sX));	ycor.add((int) (560 / sY));
+		xcor.add((int) (890 / sX));	ycor.add((int) (430 / sY));
+		xcor.add((int) (1090 / sX)); ycor.add((int) (470 / sY));
+		xcor.add((int) (1210 / sX)); ycor.add((int) (720 / sY));
+		xcor.add((int) (1140/ sX)); ycor.add((int) (940 / sY));
+		xcor.add((int) (1140 / sX)); ycor.add((int) (1030 / sY));
+		xcor.add((int) (1340 / sX)); ycor.add((int) (1030 / sY));
+		xcor.add((int) (1420 / sX)); ycor.add((int) (930 / sY));
+		xcor.add((int) (1590 / sX)); ycor.add((int) (840 / sY));
+		xcor.add((int) (1710 / sX)); ycor.add((int) (590 / sY));
+		xcor.add((int) (1810 / sX)); ycor.add((int) (490 / sY));
+		xcor.add(width); ycor.add((int) (520 / sY));
+		xcor.add(width); ycor.add(height);
+		xcor.add(0); ycor.add(height);
+		xcor.add(0); ycor.add((int) (980 / sY));
 		// Draw path
 		path = new Path();
 		for (int i = 0; i < xcor.size(); i++) {
@@ -256,14 +264,15 @@ public class SView extends SurfaceView implements Runnable,
 				if (fuel < 0) {
 					fuelFinished = true;
 				}
-				
-				if (contains(xcorland, ycorland, x + (60/sX), y + (30/sY))) {
+				canvas.drawBitmap(landing, xcorland.get(0), ycorland.get(0), paint);
+				if (contains(xcorland, ycorland, x - (60/sX), y + (30/sY)) || contains(xcorland, ycorland, x + (60/sX), y + (30/sY))) {
 					gameover = true;
 					mp.pause();
 					canvas.drawBitmap(sMessage2,  (float)((width/2)-(960/sX)), (float)((height/2)-(540/sX)), paint);
 				}
 
-				if (contains(xcor, ycor, x - (55/sX), y + (25/sY)) || contains(xcor, ycor, x + (55/sX), y + (25/sY))) {
+				if (contains(xcor, ycor, x - (55/sX), y + (25/sY)) || contains(xcor, ycor, x + (55/sX), y + (25/sY)) || contains(xcor, ycor, x, y + (25/sY)) 
+						|| contains(xcor, ycor, x - (28/sX), y + (25/sY))|| contains(xcor, ycor, x + (28/sX), y + (25/sY))) {
 					long current = android.os.SystemClock.uptimeMillis();
 					if (animStart == 0) 
 					{
