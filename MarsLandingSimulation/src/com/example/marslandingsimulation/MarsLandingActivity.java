@@ -9,6 +9,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+/**
+ * Main Activity.
+ * Setting the content view to the main layout.
+ * Calculating height and width of the Surface View.
+ */
 public class MarsLandingActivity extends Activity {
 	private SView newView;
 	boolean fuelUses = false;
@@ -24,7 +29,6 @@ public class MarsLandingActivity extends Activity {
 		// Asking window manager to display full screen.
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         Display display = getWindowManager().getDefaultDisplay();
-//        float progressBar = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
 
 		Point viewSize = new Point();
 		display.getSize(viewSize);
