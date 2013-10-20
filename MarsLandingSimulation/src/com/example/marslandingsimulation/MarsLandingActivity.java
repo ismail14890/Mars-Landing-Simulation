@@ -65,9 +65,16 @@ public class MarsLandingActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-		finish();
-		System.exit(0);
-		newView.pause();
+		if(newView.atMenu)
+		{
+			finish();
+			System.exit(0);
+			newView.pause();
+		}
+		else
+		{
+			newView.atMenu = true;
+		}
 	}
 	/**
 	 * get selected items from the menu.

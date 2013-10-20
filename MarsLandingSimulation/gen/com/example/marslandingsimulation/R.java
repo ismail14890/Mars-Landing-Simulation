@@ -29,11 +29,12 @@ public final class R {
         public static final int landing=0x7f020005;
         public static final int left=0x7f020006;
         public static final int main=0x7f020007;
-        public static final int menubg=0x7f020008;
-        public static final int right=0x7f020009;
-        public static final int ship1=0x7f02000a;
-        public static final int shipcrash=0x7f02000b;
-        public static final int stars=0x7f02000c;
+        public static final int mars=0x7f020008;
+        public static final int menubg=0x7f020009;
+        public static final int right=0x7f02000a;
+        public static final int ship1=0x7f02000b;
+        public static final int shipcrash=0x7f02000c;
+        public static final int stars=0x7f02000d;
     }
     public static final class id {
         public static final int exit=0x7f090002;
