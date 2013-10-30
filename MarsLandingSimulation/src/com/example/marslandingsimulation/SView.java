@@ -416,14 +416,14 @@ public class SView extends SurfaceView implements Runnable,
         case Surface.ROTATION_180:
 //        	xAxis = -event.values[0];
 //        	yAxis = -event.values[1];
-        	xAxis = -event.values[0];
-        	yAxis = event.values[1];
+        	xAxis = -event.values[1];
+        	yAxis = event.values[0];
             break;
         case Surface.ROTATION_270:
 //        	xAxis = event.values[1];
 //        	yAxis = -event.values[0];
-        	xAxis = -event.values[1];
-        	yAxis = -event.values[0];
+        	xAxis = -event.values[0];
+        	yAxis = -event.values[1];
             break;
     	}
 		
