@@ -138,7 +138,6 @@ public class SView extends SurfaceView implements Runnable,
 		explosion1 = sP.load(getContext(), R.raw.explosion, 1);
 		InputStream is = this.getContext().getResources().openRawResource(R.drawable.explosion);
 		explodeGif = Movie.decodeStream(is);
-		
 		windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         mDisplay = windowManager.getDefaultDisplay();
 	}
