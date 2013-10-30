@@ -2,6 +2,7 @@ package com.example.marslandingsimulation;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,11 +21,14 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 
 /**
  * SView Surface View.
@@ -37,7 +41,8 @@ import android.view.View.OnTouchListener;
  */
 public class SView extends SurfaceView implements Runnable,
 		SurfaceHolder.Callback, OnTouchListener, SensorEventListener {
-	
+	private Display mDisplay;
+	private WindowManager windowManager;
 	SoundPool sP;
 	MediaPlayer mp;
 	Movie explodeGif;
@@ -133,6 +138,9 @@ public class SView extends SurfaceView implements Runnable,
 		explosion1 = sP.load(getContext(), R.raw.explosion, 1);
 		InputStream is = this.getContext().getResources().openRawResource(R.drawable.explosion);
 		explodeGif = Movie.decodeStream(is);
+		
+		windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        mDisplay = windowManager.getDefaultDisplay();
 	}
 
 	public SView(Context context, AttributeSet attrs) {
@@ -290,7 +298,8 @@ public class SView extends SurfaceView implements Runnable,
 					}
 				}
 				if (fuel < 0) {
-					fuelFinished = true;
+					fuelFinished = false;
+					//fuelFinished = true;
 				}
 				canvas.drawBitmap(landing, xcorland.get(0), ycorland.get(0), paint);
 				// Check if the player landed safely
@@ -388,8 +397,38 @@ public class SView extends SurfaceView implements Runnable,
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		xAxis = event.values[0];
-		yAxis = event.values[1];
+		
+		xAxis=0;
+		yAxis=0;
+		switch (mDisplay.getRotation()) {
+        case Surface.ROTATION_0:
+//        	xAxis = event.values[0];
+//        	yAxis = event.values[1];
+        	xAxis = event.values[1];
+        	yAxis = -event.values[0];
+            break;
+        case Surface.ROTATION_90:
+//        	xAxis = -event.values[1];
+//        	yAxis = event.values[0];
+    		xAxis = event.values[0];
+    		yAxis = event.values[1];
+            break;
+        case Surface.ROTATION_180:
+//        	xAxis = -event.values[0];
+//        	yAxis = -event.values[1];
+        	xAxis = -event.values[0];
+        	yAxis = event.values[1];
+            break;
+        case Surface.ROTATION_270:
+//        	xAxis = event.values[1];
+//        	yAxis = -event.values[0];
+        	xAxis = -event.values[1];
+        	yAxis = -event.values[0];
+            break;
+    	}
+		
+//		xAxis = event.values[0];
+//		yAxis = event.values[1];
 	}
 
 	/**

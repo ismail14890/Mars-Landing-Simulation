@@ -1,5 +1,6 @@
 package com.example.marslandingsimulation;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.Display;
@@ -60,6 +61,7 @@ public class MarsLandingActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 		newView.resume();
 	}
 	
