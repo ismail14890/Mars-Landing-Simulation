@@ -297,8 +297,7 @@ public class SView extends SurfaceView implements Runnable,
 					}
 				}
 				if (fuel < 0) {
-					fuelFinished = false;
-					//fuelFinished = true;
+					fuelFinished = true;
 				}
 				canvas.drawBitmap(landing, xcorland.get(0), ycorland.get(0), paint);
 				// Check if the player landed safely
